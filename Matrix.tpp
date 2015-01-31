@@ -336,8 +336,7 @@ Matrix<T>& Matrix<T>::normalize() {
 //-------Moore-Penrose pseudo inverse---------//
 template<typename T>
 Matrix<T> Matrix<T>::pseudo_inv() {
-    Matrix<T> tmp(~(*this));
-    return Matrix<T>(!(tmp*(*this))*tmp);
+    return Matrix<T>(!((~(*this))*(*this))*(~(*this)));
 }
 
 //=====================================Logical Operations=======================================//

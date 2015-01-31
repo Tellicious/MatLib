@@ -87,7 +87,7 @@ int main(int argc, const char * argv[]) {
     MatrixXd AA(4,4,_dataA);
     MatrixXd BB(4,4,_dataB);
     MatrixXd Soli=!AA*BB;
-    MatrixXd Solg=linsolve(AA, BB);
+    MatrixXd Solg=LinSolve(AA, BB);
     mprint(Soli);
     mprint(Solg);
     

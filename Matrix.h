@@ -66,8 +66,6 @@ public:
     template <typename T2> Matrix<T>& copyData(const T2* data); //sets new data
     T& getData(uint8_t i) const; //retrieve a single data
     T* data() const; // retrieve all data
-    //template <typename T2> Matrix<T> fwsub(Matrix<T2> &B); // forward substitution
-    //template <typename T2> Matrix<T> bksub(Matrix<T2> &B); // backward substitution
     
 private:
     //-------Private Functions------//
