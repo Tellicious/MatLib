@@ -23,6 +23,7 @@ public:
     Matrix<T>& identity(); // sets the Matrix to an identity Matrix
     Matrix<T>& zeros(); // fills the Matrix with zeros
     Matrix<T>& operator=(const Matrix<T> &rhs); // assignment
+    Matrix<T>& operator=(const std::initializer_list<T> &rhs); // assignment with list
     //==================Operations==================//
     template <typename T2> Matrix<T> operator+(const Matrix<T2> &rhs) const; // Matrix addition
     template <typename T2> Matrix<T> operator+(T2 scalar) const; // Matrix and scalar addition

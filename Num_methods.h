@@ -116,7 +116,6 @@ template<typename T>  Matrix<T> LinSolve(Matrix<T> &A, Matrix<T> &B) {
     return(Matrix<T>(bksub(A,B)));
 };
 
-
 //------------Gauss-Newton Method with 9 parameters---------------//
 // approximates Data to a sphere by calculating 6 gains (s) and 3 biases (b), useful to calibrate some sensors (meas_sphere=S*(meas-B) with S symmetric)
 // Data has n>=9 rows corresponding to the number of measures and 3 columns corresponding to the 3 axis

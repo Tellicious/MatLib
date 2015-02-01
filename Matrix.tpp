@@ -20,7 +20,8 @@ Matrix<T>::Matrix(uint8_t m, uint8_t n, T* data) {
     allocate();
     if (data) {
         copyData(data);
-    } else {
+    }
+    else {
         zeros();
     }
 }
@@ -84,6 +85,18 @@ Matrix<T>& Matrix<T>::zeros(){
 template<typename T>
 Matrix<T>& Matrix<T>::operator=(const Matrix<T> &rhs) {
     return copyMatrix(rhs);
+}
+
+//-----------------Assignment with list--------------------//
+template<typename T>
+Matrix<T>& Matrix<T>::operator=(const std::initializer_list<T> &rhs){
+    //std::initializer_list<T>::iterator it;
+    uint8_t ii=0;
+    for (auto it : rhs){
+        _data[ii]=it;
+        ii++;
+    }
+    return *this;
 }
 
 //==========================================Operations=============================================//
@@ -458,42 +471,7 @@ template<typename T>
 T* Matrix<T>::data() const{
     return this->_data;
 }
-/*//-------------------Forward substitution----------------------//
-// assumes that the matrix is already a lower triangular one. No check!
-template<typename T>
-template <typename T2> Matrix<T> Matrix<T>::fwsub(Matrix<T2> &B){
-    Matrix<T> result(_ncols,B.columns());
-    for (int k=0;k<B.columns();k++){
-        result.set(0,k) = B.get(0,k) / get(0,0);
-        for (int i=1;i<_nrows;i++){
-            T tmp=0.0;
-            for (int j=0;j<i;j++){
-                tmp+=get(i,j) * (result.get(j,k));
-            }
-            result.set(i, k)= (B.get(i,k) - tmp) / get(i,i);
-        }
-    }
-    return result;
-}
 
-//-------------------Backward substitution----------------------//
-// assumes that the matrix is already an upper triangular one. No check!
-template<typename T>
-template <typename T2> Matrix<T> Matrix<T>::bksub(Matrix<T2> &B){
-    Matrix<T> result(_ncols,B.columns());
-    for (int k=0;k<B.columns();k++){
-        result.set(_ncols-1,k) = B.get(_ncols-1,k) / get(_ncols-1,_ncols-1);
-        for (int i=_nrows-2;i>=0;i--){
-            T tmp=0.0;
-            for (int j=_ncols-1;j>i;j--){
-                tmp+=get(i,j) * (result.get(j,k));
-            }
-            result.set(i, k)= (B.get(i,k) - tmp) / get(i,i);
-        }
-    }
-    return result;
-}
-*/
 //===========================================Private==============================================//
 //----------------------Releases memory------------------------//
 template<typename T>

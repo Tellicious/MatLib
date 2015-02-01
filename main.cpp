@@ -20,19 +20,35 @@ template <typename T> void mprint(Matrix<T>& r) {
 
 /*class Test{
  public:
- Test (int a,int b,std::initializer_list<double> l){
- double* e=new double[l.size()];
- std::copy(l.begin(), l.end(), e);
- for (int ii=0;ii<=a;ii++){
- printf("%f, %d\n",e[ii],ii);
+ Test (int a,int b){
+     _a=a;
+     _b=b;
  }
- }
+    int operator=(const std::initializer_list<int> &v){
+        std::initializer_list<int>::iterator it;
+        delete [] _ciccio;
+        _ciccio=0;
+        this->_ciccio= new int [v.size()];
+        int ii=0;
+        for (it=v.begin(); it!=v.end();it++)
+        {
+            _ciccio[ii]= *it;
+            printf("%d\n",_ciccio[ii]);
+            ii++;
+        }
+        return 1;
+    }
+    int* _ciccio;
+    
+private:
+    int _a;
+    int _b;
  };*/
 
 int main(int argc, const char * argv[]) {
-    //Test cc(6,2,{1,3,4,7,12,33,54});
     // TEST GAUSS
-    double _data[]={-0.009345794,	0.00952381,	1,
+     MatrixXd Data(10,3);
+    Data={-0.009345794,	0.00952381,	1,
         -1,	-0.00952381,	0.044247788,
         1,	0.028571429,	0.008849558,
         -0.009345794,	1,	-0.115044248,
@@ -42,7 +58,6 @@ int main(int argc, const char * argv[]) {
         0.644859813,	0.771428571,	-0.061946903,
         0.775700935,	-0.619047619,	-0.115044248,
         0.981308411,	0.00952381,	-0.256637168};
-    MatrixXd Data(10,3,_data);
     int8_t _data0[]={0,0,0,1,0,0,1,0,1};
      MatrixXs X0(9,1,_data0);
      int8_t _data01[]={0,0,0,1,1,1};
@@ -90,6 +105,8 @@ int main(int argc, const char * argv[]) {
     MatrixXd Solg=LinSolve(AA, BB);
     mprint(Soli);
     mprint(Solg);
+    
+    
     
     return 0;
 }
