@@ -9,7 +9,7 @@
 #include <iostream>
 #include "Matlib.h"
 
-template <typename T> void mprint(Matrix<T>& r) {
+template <typename T> void mprint(MatrixX<T>& r) {
     std::cout << "\n" << (int) r.rows() << "x" << (int) r.columns() << "\n";
     for(int i=0; i<r.rows(); i++) {
         for (int j=0; j<r.columns(); j++)
@@ -91,10 +91,10 @@ int main(int argc, const char * argv[]) {
     mprint(S4);
     
     // TEST LINSOLVE
-    double _dataA[]={0.0462,    0.3171,    0.3816,    0.4898,
-        123,    0.9502,    445,    0.4456,
-        0.8235,    112,    0.7952,    0.6463,
-        0.6948,    2324,    0.1869,    4456};
+    double _dataA[]={153,    0.3171,    0.3816,    0.4898,
+        0.0462,    0.4358,    445,    0.4456,
+        0.8235,    155,    0.7952,    0.6463,
+        0.6948,    0.9745,    0.1869,    4456};
     double _dataB[]={0.7547,    0.1626,    0.3404,    0.2551,
         0.2760,    0.1190,    0.5853,    0.5060,
         0.6797,    0.4984,    0.2238,    0.6991,
@@ -102,9 +102,12 @@ int main(int argc, const char * argv[]) {
     MatrixXd AA(4,4,_dataA);
     MatrixXd BB(4,4,_dataB);
     MatrixXd Soli=!AA*BB;
-    MatrixXd Solg=LinSolve(AA, BB);
+    MatrixXd Solg=LinSolveGauss(AA, BB);
+    MatrixXd Soll=LinSolveLU(AA, BB);
     mprint(Soli);
     mprint(Solg);
+    mprint(Soll);
+    printf("\n%f\n",AA.det());
     
     
     

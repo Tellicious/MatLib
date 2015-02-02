@@ -1,19 +1,19 @@
 //
-//  Matrix.tpp
+//  MatrixX.tpp
 //
 //
 //  Created by Andrea Vivani on 31/1/15.
 //  Copyright (c) 2015 Andrea Vivani. All rights reserved.
 //
 
-#include "Matrix.h"
+#include "MatrixX.h"
 #include <math.h>
 #include <stdint.h>
 
 //==========================================Assignment=============================================//
 //-----------------------Constructor------------------------//
 template<typename T>
-Matrix<T>::Matrix(uint8_t m, uint8_t n, T* data) {
+MatrixX<T>::MatrixX(uint8_t m, uint8_t n, T* data) {
     this->_nrows = m;
     this->_ncols = n;
     this->_data = 0;
@@ -28,7 +28,7 @@ Matrix<T>::Matrix(uint8_t m, uint8_t n, T* data) {
 
 //-----------Initialize as equal, same datatype-------------//
 template<typename T>
-Matrix<T>::Matrix(const Matrix<T> &rhs) {
+MatrixX<T>::MatrixX(const MatrixX<T> &rhs) {
     _nrows = 0;
     _ncols = 0;
     _data = 0;
@@ -37,7 +37,7 @@ Matrix<T>::Matrix(const Matrix<T> &rhs) {
 
 //-----------Initialize as equal, diff datatype--------------//
 template<typename T>
-template <typename T2> Matrix<T>::Matrix(const Matrix<T2> &rhs) {
+template <typename T2> MatrixX<T>::MatrixX(const MatrixX<T2> &rhs) {
     _nrows = 0;
     _ncols = 0;
     _data = 0;
@@ -46,25 +46,25 @@ template <typename T2> Matrix<T>::Matrix(const Matrix<T2> &rhs) {
 
 //--------------------Sets single element-------------------//
 template<typename T>
-T& Matrix<T>::set(uint8_t i, uint8_t j) {
+T& MatrixX<T>::set(uint8_t i, uint8_t j) {
     return _data[(i * _ncols + j)];
 }
 
 //--------------Sets and returns single element-------------//
 template<typename T>
-T& Matrix<T>::operator()(uint8_t i, uint8_t j){
+T& MatrixX<T>::operator()(uint8_t i, uint8_t j){
     return set(i, j);
 }
 
 //----------------------Deconstructor-----------------------//
 template<typename T>
-Matrix<T>::~Matrix() {
+MatrixX<T>::~MatrixX() {
     release();
 }
 
 //---------------------Identity Matrix----------------------//
 template<typename T>
-Matrix<T>& Matrix<T>::identity() {
+MatrixX<T>& MatrixX<T>::identity() {
     zeros();
     for(uint8_t i=0; i<_nrows; i++) {
         set(i,i) = 1.0;
@@ -74,7 +74,7 @@ Matrix<T>& Matrix<T>::identity() {
 
 //----------------------Zeros Matrix-----------------------//
 template<typename T>
-Matrix<T>& Matrix<T>::zeros(){
+MatrixX<T>& MatrixX<T>::zeros(){
     for (uint8_t i=0; i<_nrows * _ncols; i++) {
         this->_data[i] = 0.0;
     }
@@ -83,13 +83,13 @@ Matrix<T>& Matrix<T>::zeros(){
 
 //-----------------------Assignment------------------------//
 template<typename T>
-Matrix<T>& Matrix<T>::operator=(const Matrix<T> &rhs) {
+MatrixX<T>& MatrixX<T>::operator=(const MatrixX<T> &rhs) {
     return copyMatrix(rhs);
 }
 
 //-----------------Assignment with list--------------------//
 template<typename T>
-Matrix<T>& Matrix<T>::operator=(const std::initializer_list<T> &rhs){
+MatrixX<T>& MatrixX<T>::operator=(const std::initializer_list<T> &rhs){
     //std::initializer_list<T>::iterator it;
     uint8_t ii=0;
     for (auto it : rhs){
@@ -99,22 +99,23 @@ Matrix<T>& Matrix<T>::operator=(const std::initializer_list<T> &rhs){
     return *this;
 }
 
+
 //==========================================Operations=============================================//
 //--------------------Matrix addition----------------------//
 template<typename T>
-template <typename T2> Matrix<T> Matrix<T>::operator+(const Matrix<T2> &rhs) const{
-    return Matrix<T>(*this) += rhs;
+template <typename T2> MatrixX<T> MatrixX<T>::operator+(const MatrixX<T2> &rhs) const{
+    return MatrixX<T>(*this) += rhs;
 }
 
 //--------------------Scalar addition----------------------//
 template<typename T>
-template <typename T2> Matrix<T> Matrix<T>::operator+(T2 scalar) const{
-    return Matrix<T>(*this) += scalar;
+template <typename T2> MatrixX<T> MatrixX<T>::operator+(T2 scalar) const{
+    return MatrixX<T>(*this) += scalar;
 }
 
 //---------------Matrix addition in place-----------------//
 template<typename T>
-template <typename T2> Matrix<T>& Matrix<T>::operator+=(const Matrix<T2> &rhs) {
+template <typename T2> MatrixX<T>& MatrixX<T>::operator+=(const MatrixX<T2> &rhs) {
     for (uint8_t i=0; i<_nrows*_ncols; i++)
         _data[i]+= rhs.getData(i);
     return *this;
@@ -122,25 +123,25 @@ template <typename T2> Matrix<T>& Matrix<T>::operator+=(const Matrix<T2> &rhs) {
 
 //---------------Scalar addition in place-----------------//
 template<typename T>
-template <typename T2> Matrix<T>& Matrix<T>::operator+=(T2 scalar) {
+template <typename T2> MatrixX<T>& MatrixX<T>::operator+=(T2 scalar) {
     for (uint8_t i=0; i<_nrows*_ncols; i++)
         _data[i]+= scalar;
     return *this;
 }
 //------------------Matrix subtraction--------------------//
 template<typename T>
-template <typename T2> Matrix<T> Matrix<T>::operator-(const Matrix<T2> &rhs) const{
-    return Matrix<T>(*this) -= rhs;
+template <typename T2>MatrixX<T> MatrixX<T>::operator-(const MatrixX<T2> &rhs) const{
+    return MatrixX<T>(*this) -= rhs;
 }
 //------------------Scalar subtraction--------------------//
 template<typename T>
-template <typename T2> Matrix<T> Matrix<T>::operator-(T2 scalar) const{
-    return Matrix<T>(*this) -= scalar;
+template <typename T2> MatrixX<T> MatrixX<T>::operator-(T2 scalar) const{
+    return MatrixX<T>(*this) -= scalar;
 }
 
 //-------------Matrix subtraction in place---------------//
 template<typename T>
-template <typename T2> Matrix<T>& Matrix<T>::operator-=(const Matrix<T2> &rhs) {
+template <typename T2> MatrixX<T>& MatrixX<T>::operator-=(const MatrixX<T2> &rhs) {
     for (uint8_t i=0; i<_nrows*_ncols; i++)
         _data[i]-= rhs.getData(i);
     return *this;
@@ -148,7 +149,7 @@ template <typename T2> Matrix<T>& Matrix<T>::operator-=(const Matrix<T2> &rhs) {
 
 //-------------Scalar subtraction in place---------------//
 template<typename T>
-template <typename T2> Matrix<T>& Matrix<T>::operator-=(T2 scalar) {
+template <typename T2> MatrixX<T>& MatrixX<T>::operator-=(T2 scalar) {
     for (uint8_t i=0; i<_nrows*_ncols; i++)
         _data[i]-= scalar;
     return *this;
@@ -156,11 +157,11 @@ template <typename T2> Matrix<T>& Matrix<T>::operator-=(T2 scalar) {
 
 //---------------Matrix multiplication------------------//
 template<typename T>
-template <typename T2> Matrix<T> Matrix<T>::operator*(const Matrix<T2> &rhs) const {
+template <typename T2> MatrixX<T> MatrixX<T>::operator*(const MatrixX<T2> &rhs) const {
     if (_ncols != rhs.rows()) {
-        return Matrix<T>(0, 0);
+        return MatrixX<T>(0, 0);
     }
-    Matrix<T> result(_nrows, rhs.columns());
+    MatrixX<T> result(_nrows, rhs.columns());
     for (uint8_t i=0; i < _nrows; i++)
         for (uint8_t j=0; j < rhs.columns(); j++)
             for (uint8_t k=0; k < _ncols; k++)
@@ -170,20 +171,20 @@ template <typename T2> Matrix<T> Matrix<T>::operator*(const Matrix<T2> &rhs) con
 
 //---------------Scalar multiplication------------------//
 template<typename T>
-template <typename T2> Matrix<T> Matrix<T>::operator*(T2 scalar) const {
-    return Matrix<T>(*this)*=scalar;
+template <typename T2> MatrixX<T> MatrixX<T>::operator*(T2 scalar) const {
+    return MatrixX<T>(*this)*=scalar;
 }
 
 //-----------Matrix multiplication in place-------------//
 template<typename T>
-template <typename T2> Matrix<T>& Matrix<T>::operator*=(const Matrix<T2> &rhs){
+template <typename T2> MatrixX<T>& MatrixX<T>::operator*=(const MatrixX<T2> &rhs){
     *this=*this*rhs;
     return *this;
 }
 
 //-----------Scalar multiplication in place-------------//
 template<typename T>
-template <typename T2> Matrix<T>& Matrix<T>::operator*=(T2 scalar){
+template <typename T2> MatrixX<T>& MatrixX<T>::operator*=(T2 scalar){
     for (uint8_t i=0; i<_nrows * _ncols; i++)
         _data[i] *= scalar;
     return *this;
@@ -191,14 +192,14 @@ template <typename T2> Matrix<T>& Matrix<T>::operator*=(T2 scalar){
 
 //-----------Element-wise multiplication ---------------//
 template<typename T>
-template <typename T2> Matrix<T> Matrix<T>::elw_mult(const Matrix<T2> &rhs) const{
+template <typename T2> MatrixX<T> MatrixX<T>::elw_mult(const MatrixX<T2> &rhs) const{
     // element-wise multiplication
-    return Matrix<T>(*this).elw_multSelf(rhs);
+    return MatrixX<T>(*this).elw_multSelf(rhs);
 }
 
 //--------Element-wise multiplication in place----------//
 template<typename T>
-template <typename T2> Matrix<T>& Matrix<T>::elw_multSelf(const Matrix<T2> &rhs) {
+template <typename T2> MatrixX<T>& MatrixX<T>::elw_multSelf(const MatrixX<T2> &rhs) {
     // element-wise multiplication with self-modification
     for (uint8_t i=0; i<_nrows*_ncols; i++)
         _data[i]*= rhs.getData(i);
@@ -207,10 +208,10 @@ template <typename T2> Matrix<T>& Matrix<T>::elw_multSelf(const Matrix<T2> &rhs)
 
 //---------------Vector cross-product-------------------//
 template<typename T>
-template <typename T2> Matrix<T> Matrix<T>::cross(const Matrix<T2> &rhs) const {
+template <typename T2> MatrixX<T> MatrixX<T>::cross(const MatrixX<T2> &rhs) const {
     if (((_nrows*_ncols)!=3) || ((rhs.columns()*rhs.rows())!=3)) //three element vectors only
-        return Matrix<T>(0,0); //empty
-    Matrix<T> result(3,1);
+        return MatrixX<T>(0,0); //empty
+    MatrixX<T> result(3,1);
     result(0,0) = _data[1] * rhs.getData(2) - _data[2] * rhs.getData(1);
     result(1,0) = _data[2] * rhs.getData(0) - _data[0] * rhs.getData(2);
     result(2,0) = _data[0] * rhs.getData(1) - _data[1] * rhs.getData(0);
@@ -219,21 +220,21 @@ template <typename T2> Matrix<T> Matrix<T>::cross(const Matrix<T2> &rhs) const {
 
 //---------------------Opposed-------------------------//
 template<typename T>
-Matrix<T> Matrix<T>::operator-() const{
-    return Matrix<T>(*this) *= -1.0;
+MatrixX<T> MatrixX<T>::operator-() const{
+    return MatrixX<T>(*this) *= -1.0;
 }
 
 //---------------------Inverse-------------------------//
 template<typename T>
-Matrix<T> Matrix<T>::operator!() const{
-    Matrix<T> result(*this);
+MatrixX<T> MatrixX<T>::operator!() const{
+    MatrixX<T> result(*this);
     result.inverse();
     return result;
 }
 
 //-----------------Inverse in place--------------------//
 template<typename T>
-Matrix<T>& Matrix<T>::inverse() {
+MatrixX<T>& MatrixX<T>::inverse() {
     int16_t pivrow=0;     // keeps track of current pivot row
     int16_t k;
     unsigned int i,j;      // k: overall index along diagonal; i: row index; j: col index
@@ -320,8 +321,8 @@ Matrix<T>& Matrix<T>::inverse() {
 
 //-----------------Transposed--------------------//
 template<typename T>
-Matrix<T> Matrix<T>::operator~() const {
-    Matrix<T> result(_ncols,_nrows);
+MatrixX<T> MatrixX<T>::operator~() const {
+    MatrixX<T> result(_ncols,_nrows);
     for (uint8_t ii=0;ii<_nrows;ii++){
         for (uint8_t jj=0;jj<_ncols;jj++){
             result.set(jj,ii)=get(ii,jj);
@@ -332,13 +333,13 @@ Matrix<T> Matrix<T>::operator~() const {
 
 //-----------------Nomalized--------------------//
 template<typename T>
-Matrix<T> Matrix<T>::normalized() {
-    return Matrix<T>(*this).normalize();
+MatrixX<T> MatrixX<T>::normalized() {
+    return MatrixX<T>(*this).normalize();
 }
 
 //------------Nomalized in place---------------//
 template<typename T>
-Matrix<T>& Matrix<T>::normalize() {
+MatrixX<T>& MatrixX<T>::normalize() {
     T k = norm();
     if (k > 0) {
         *this *= (1 / k);
@@ -348,14 +349,14 @@ Matrix<T>& Matrix<T>::normalize() {
 
 //-------Moore-Penrose pseudo inverse---------//
 template<typename T>
-Matrix<T> Matrix<T>::pseudo_inv() {
-    return Matrix<T>(!((~(*this))*(*this))*(~(*this)));
+MatrixX<T> MatrixX<T>::pseudo_inv() {
+    return MatrixX<T>(!((~(*this))*(*this))*(~(*this)));
 }
 
 //=====================================Logical Operations=======================================//
 //---------------True if equal----------------//
 template<typename T>
-template <typename T2> bool  Matrix<T>::operator==(const Matrix<T2> &other) const{
+template <typename T2> bool  MatrixX<T>::operator==(const MatrixX<T2> &other) const{
     if (_nrows != other.rows() || _ncols != other.columns())
         return false;
     
@@ -369,20 +370,20 @@ template <typename T2> bool  Matrix<T>::operator==(const Matrix<T2> &other) cons
 
 //-------------True if not equal--------------//
 template<typename T>
-template <typename T2> bool  Matrix<T>::operator!=(const Matrix<T2> &other) const{
+template <typename T2> bool  MatrixX<T>::operator!=(const MatrixX<T2> &other) const{
     return !((*this) == other);
 }
 
 //=======================================Matrix Data=========================================//
 //---------Returns one single element---------//
 template<typename T>
-const T& Matrix<T>::get(uint8_t i, uint8_t j) const{
+const T& MatrixX<T>::get(uint8_t i, uint8_t j) const{
     return _data[(i * _ncols + j)];
 }
 
 //-------------Returns the trace-------------//
 template<typename T>
-T Matrix<T>::trace() const {
+T MatrixX<T>::trace() const {
     T result = 0.0;
     for (uint8_t i=0; i<_nrows && i<_ncols; i++) {
         result += get(i, i);
@@ -392,25 +393,25 @@ T Matrix<T>::trace() const {
 
 //---------Returns the number of rows--------//
 template<typename T>
-uint8_t Matrix<T>::rows() const{
+uint8_t MatrixX<T>::rows() const{
     return _nrows;
 }
 
 //-------Returns the number of columns-------//
 template<typename T>
-uint8_t Matrix<T>::columns() const{
+uint8_t MatrixX<T>::columns() const{
     return _ncols;
 }
 
 //------------Returns the length------------//
 template<typename T>
-uint8_t Matrix<T>::length() const{
+uint8_t MatrixX<T>::length() const{
     return fmax(_nrows, _ncols);
 }
 
 //-------------Returns the norm--------------//
 template<typename T>
-double Matrix<T>::norm() const {
+double MatrixX<T>::norm() const {
     double result = 0.0;
     for (uint8_t i=0; i<_nrows*_ncols; i++){
         result += _data[i]*_data[i];
@@ -421,7 +422,7 @@ double Matrix<T>::norm() const {
 
 //--------------Returns the sum--------------//
 template<typename T>
-T Matrix<T>::sum() const {
+T MatrixX<T>::sum() const {
     T result = 0.0;
     for (uint8_t i=0; i<_nrows*_ncols; i++)
         result += _data[i];
@@ -430,19 +431,57 @@ T Matrix<T>::sum() const {
 
 //------------Returns the product------------//
 template<typename T>
-T Matrix<T>::product() const {
+T MatrixX<T>::product() const {
     T result = 1.0;
     for (uint8_t i=0; i<_nrows*_ncols; i++)
         result *= _data[i];
     return result;
 }
+//-----------Returns the determinant----------//
+template<typename T>
+T MatrixX<T>::det() const{
+    // LU decomposition using Crout's method
+    MatrixX<T> U(_nrows,_nrows);
+    MatrixX<T> L(_nrows,_nrows);
+    int16_t ii, jj, kk;
+    T sum = 0;
+    T determinant=1;
+    U.identity();
+    
+    for (jj = 0; jj < _nrows; jj++) {
+        for (ii = jj; ii < _nrows; ii++) {
+            sum = 0;
+            for (kk = 0; kk < jj; kk++) {
+                sum += L.get(ii,kk) * U(kk,jj);
+            }
+            L.set(ii,jj) = get(ii,jj) - sum;
+        }
+        
+        for (ii = jj; ii < _nrows; ii++) {
+            sum = 0;
+            for(kk = 0; kk < jj; kk++) {
+                sum += L.get(jj,kk) * U.get(kk,ii);
+            }
+            if (L.get(jj,jj) == 0) {
+                return 0;
+            }
+            U.set(jj,ii) = (get(jj,ii) - sum) / L.get(jj,jj);
+        }
+    }
+    // Done LU decomposition
+    // Since U is a unit upper triangular matrix, the determinant is just the product of the diagonal elements of L
+    for (ii=0;ii<_nrows;ii++){
+        determinant*=L.get(ii,ii);
+    }
+    return determinant;
+}
 
 //------------Returns a subMatrix------------//
 template<typename T>
-Matrix<T> Matrix<T>::subMatrix(uint8_t row_top, uint8_t col_left, uint8_t row_bottom, uint8_t col_right) const {
+MatrixX<T> MatrixX<T>::subMatrix(uint8_t row_top, uint8_t col_left, uint8_t row_bottom, uint8_t col_right) const {
     uint8_t rows = row_bottom-row_top+1;
     uint8_t cols = col_right-col_left+1;
-    Matrix<T> result(rows, cols);
+    MatrixX<T> result(rows, cols);
     
     for(uint8_t i=0;i<rows; i++)
         for(uint8_t j=0; j<cols; j++)
@@ -454,7 +493,7 @@ Matrix<T> Matrix<T>::subMatrix(uint8_t row_top, uint8_t col_left, uint8_t row_bo
 //==========================================Auxiliary=============================================//
 //------------Copies data of one Matrix to another-------------//
 template<typename T>
-template <typename T2> Matrix<T>& Matrix<T>::copyData(const T2* data) {
+template <typename T2> MatrixX<T>& MatrixX<T>::copyData(const T2* data) {
     for (uint8_t i=0; i<_nrows*_ncols; i++)
         this->_data[i] = (T) data[i];
     return *this;
@@ -462,20 +501,20 @@ template <typename T2> Matrix<T>& Matrix<T>::copyData(const T2* data) {
 
 //------------Returns one single value of data-----------------//
 template<typename T>
-T& Matrix<T>::getData(uint8_t i) const{
+T& MatrixX<T>::getData(uint8_t i) const{
     return _data[i];
 }
 
 //-------------Returns the whole data vector-------------------//
 template<typename T>
-T* Matrix<T>::data() const{
+T* MatrixX<T>::data() const{
     return this->_data;
 }
 
 //===========================================Private==============================================//
 //----------------------Releases memory------------------------//
 template<typename T>
-void Matrix<T>::release() {
+void MatrixX<T>::release() {
     if (_data && _isAllocated) {
         delete[] _data;
         _data = 0;
@@ -485,7 +524,7 @@ void Matrix<T>::release() {
 
 //----------------------Allocates memory-----------------------//
 template<typename T>
-void Matrix<T>::allocate() {
+void MatrixX<T>::allocate() {
     release();
     if (_nrows && _ncols)
         this->_data = new T[_nrows * _ncols];
@@ -496,7 +535,7 @@ void Matrix<T>::allocate() {
 
 //----------------Copies one Matrix to another-----------------//
 template<typename T>
-template <typename T2> Matrix<T>& Matrix<T>::copyMatrix(const Matrix<T2> &another) {
+template <typename T2> MatrixX<T>& MatrixX<T>::copyMatrix(const MatrixX<T2> &another) {
     if ((*this) != another) {
         if (_nrows * _ncols != another.rows() * another.columns()) {
             _nrows = another.rows();
@@ -514,7 +553,7 @@ template <typename T2> Matrix<T>& Matrix<T>::copyMatrix(const Matrix<T2> &anothe
 
 //---------------Data index from row and column----------------//
 template<typename T>
-uint8_t Matrix<T>::index(uint8_t i, uint8_t j) const{
+uint8_t MatrixX<T>::index(uint8_t i, uint8_t j) const{
     return i * _ncols + j;
 }
 

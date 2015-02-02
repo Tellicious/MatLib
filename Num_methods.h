@@ -13,8 +13,8 @@
 
 //-------------------Forward substitution----------------------//
 // assumes that the matrix A is already a lower triangular one. No check!
-template <typename T, typename T2> Matrix<T> fwsub(Matrix<T> &A, Matrix<T2> &B){
-    Matrix<T> result(A.columns(),B.columns());
+template <typename T, typename T2> MatrixX<T> fwsub(MatrixX<T> &A, MatrixX<T2> &B){
+    MatrixX<T> result(A.columns(),B.columns());
     for (int k=0;k<B.columns();k++){
         result.set(0,k) = B.get(0,k) / A.get(0,0);
         for (int i=1;i<A.rows();i++){
@@ -30,9 +30,9 @@ template <typename T, typename T2> Matrix<T> fwsub(Matrix<T> &A, Matrix<T2> &B){
 
 //-------------------Backward substitution----------------------//
 // assumes that the matrix A is already an upper triangular one. No check!
-template <typename T, typename T2> Matrix<T> bksub(Matrix<T> &A, Matrix<T2> &B){
+template <typename T, typename T2> MatrixX<T> bksub(MatrixX<T> &A, MatrixX<T2> &B){
     int16_t ncolsA=A.columns();
-    Matrix<T> result(ncolsA,B.columns());
+    MatrixX<T> result(ncolsA,B.columns());
     for (int k=0;k<B.columns();k++){
         result.set(ncolsA-1,k) = B.get(ncolsA-1,k) / A.get(ncolsA-1,ncolsA-1);
         for (int i=A.rows()-2;i>=0;i--){
@@ -45,27 +45,69 @@ template <typename T, typename T2> Matrix<T> bksub(Matrix<T> &A, Matrix<T2> &B){
     }
     return result;
 };
+//-------------------------LU factorization using Crout's Method--------------------------------//
+// factorizes the A matrix as the product of a unit upper triangular matrix U and a lower triangular matrix L
+template <typename T> bool LU_crout(const MatrixX<T> &A, MatrixX<T> &L, MatrixX<T> &U){
+    int16_t ii, jj, kk;
+    T sum = 0;
+    int16_t nrowsA=A.rows();
+    L.zeros();
+    U.identity();
+    
+    for (jj = 0; jj < nrowsA; jj++) {
+        for (ii = jj; ii < nrowsA; ii++) {
+            sum = 0;
+            for (kk = 0; kk < jj; kk++) {
+                sum += L.get(ii,kk) * U(kk,jj);
+            }
+            L.set(ii,jj) = A.get(ii,jj) - sum;
+        }
+        
+        for (ii = jj; ii < nrowsA; ii++) {
+            sum = 0;
+            for(kk = 0; kk < jj; kk++) {
+                sum += L.get(jj,kk) * U.get(kk,ii);
+            }
+            if (L.get(jj,jj) == 0) {
+                return false;
+            }
+            U.set(jj,ii) = (A.get(jj,ii) - sum) / L.get(jj,jj);
+        }
+    }
+    return true;
+};
+
+//-----------------------Linear system solver using LU factorization---------------------------//
+// solves the linear system A*X=B, where A is a n-by-n matrix and B an n-by-m matrix, giving the n-by-m matrix X
+template<typename T>  MatrixX<T> LinSolveLU(MatrixX<T> &A, MatrixX<T> &B) {
+    MatrixX<T> L(A.rows(),A.columns());
+    MatrixX<T> U(L);
+    LU_crout(A, L, U);
+    MatrixX<T> y=fwsub(L,B);
+    return MatrixX<T>(bksub(U,y));
+}
 
 //------------Linear system solver using Gauss elimination with partial pivoting---------------//
 // solves the linear system A*X=B, where A is a n-by-n matrix and B an n-by-m matrix, giving the n-by-m matrix X
 
-template<typename T>  Matrix<T> LinSolve(Matrix<T> &A, Matrix<T> &B) {
+template<typename T>  MatrixX<T> LinSolveGauss(MatrixX<T> &A, MatrixX<T> &B) {
+    MatrixX<T> A_tmp=A;
+    MatrixX<T> B_tmp=B;
     int16_t pivrow=0;     // keeps track of current pivot row
-    int16_t k;
-    int16_t ncolsA=A.columns();
-    int16_t ncolsB=B.columns();
-    unsigned int i,j;      // k: overall index along diagonals; i: row index; j: col index
+    int16_t ncolsA=A_tmp.columns();
+    int16_t ncolsB=B_tmp.columns();
+    int16_t k,i,j;      // k: overall index along diagonals; i: row index; j: col index
     double tmp;      // used for finding max value and making row swaps
     double tmp2;  // used to store abs when finding max value and to store coefficient value when eliminating values
     
     for (k = 0; k < (ncolsA-1); k++){
         
         // find pivot row, the row with biggest entry in current column
-        tmp = fabs(A.get(k,k));
+        tmp = fabs(A_tmp.get(k,k));
         pivrow=k;
         for (i = k+1; i < ncolsA; i++)
         {
-            tmp2=fabs(A.get(i,k)); // 'Avoid using other functions inside abs()?'
+            tmp2=fabs(A_tmp.get(i,k)); // 'Avoid using other functions inside abs()?'
             if (tmp2 >= tmp)
             {
                 tmp = tmp2;
@@ -74,46 +116,46 @@ template<typename T>  Matrix<T> LinSolve(Matrix<T> &A, Matrix<T> &B) {
         }
         
         // check for singular Matrix
-        if (A.get(pivrow,k) == 0.0)
+        if (A_tmp.get(pivrow,k) == 0.0)
         {
-            return Matrix<T>(0,0);
+            return MatrixX<T>(0,0);
         }
         
         // Execute pivot (row swap) if needed
         if (pivrow != k)
         {
             // swap row k of matrix A with pivrow
-            for (j = 0; j < ncolsA; j++)
+            for (j = k; j < ncolsA; j++)
             {
-                tmp = A.get(k, j);
-                A.set(k, j) = A.get(pivrow,j);
-                A.set(pivrow, j) = tmp;
+                tmp = A_tmp.get(k, j);
+                A_tmp.set(k, j) = A_tmp.get(pivrow,j);
+                A_tmp.set(pivrow, j) = tmp;
             }
             // swap row k of matrix B with pivrow
             for (j = 0; j < ncolsB; j++)
             {
-                tmp = B.get(k, j);
-                B.set(k, j) = B.get(pivrow,j);
-                B.set(pivrow, j) = tmp;
+                tmp = B_tmp.get(k, j);
+                B_tmp.set(k, j) = B_tmp.get(pivrow,j);
+                B_tmp.set(pivrow, j) = tmp;
             }
         }
         
         // Row reduction
-        tmp = 1.0/A.get(k,k);    // invert pivot element
+        tmp = 1.0/A_tmp.get(k,k);    // invert pivot element
         for (i=k+1;i<ncolsA;i++){ // along rows
-            tmp2=A.get(i,k)*tmp;
+            tmp2=A_tmp.get(i,k)*tmp;
             // Perform row reduction of A
             for (j=k+1;j<ncolsA;j++){ //along columns of A
-                A.set(i,j)-=tmp2*A.get(k,j);
+                A_tmp.set(i,j)-=tmp2*A_tmp.get(k,j);
             }
             // Perform row reduction of B
             for (j=0;j<ncolsB;j++){ //along columns of B
-                B.set(i,j)-=tmp2*B.get(k,j);
+                B_tmp.set(i,j)-=tmp2*B_tmp.get(k,j);
             }
         }
         
     }
-    return(Matrix<T>(bksub(A,B)));
+    return(MatrixX<T>(bksub(A_tmp,B_tmp)));
 };
 
 //------------Gauss-Newton Method with 9 parameters---------------//
@@ -130,16 +172,16 @@ template<typename T>  Matrix<T> LinSolve(Matrix<T> &A, Matrix<T> &B) {
  s23=out(7,0);
  s33=out(8,0);*/
 
-template <typename T, typename T2> Matrix<T> GaussNewton_9(Matrix<T> &Data, Matrix<T2> &X0, uint16_t nmax, double tol){
-    Matrix<T> result(X0);
+template <typename T, typename T2> MatrixX<T> GaussNewton_9(MatrixX<T> &Data, MatrixX<T2> &X0, uint16_t nmax, double tol){
+    MatrixX<T> result(X0);
     uint16_t nrows=Data.rows();
     uint16_t ncols=Data.columns();
     
     if ((nrows<9)||(ncols!=3))
-        return Matrix<T>(0,0);
+        return MatrixX<T>(0,0);
     
-    Matrix<T> Jr(nrows,9);
-    Matrix<T> res(nrows,1);
+    MatrixX<T> Jr(nrows,9);
+    MatrixX<T> res(nrows,1);
     for (int n_iter=1;n_iter<nmax;n_iter++){
         for (int jj=0;jj<nrows;jj++){
             T d1=Data.get(jj,0) - result.get(0,0);
@@ -163,7 +205,7 @@ template <typename T, typename T2> Matrix<T> GaussNewton_9(Matrix<T> &Data, Matr
             res.set(jj,0)= t1*t1+t2*t2+t3*t3-1;
         }
         // pseudo-inverse*res (inv(Jr'*Jr)*Jr'*res)
-        Matrix<T> delta(Jr.pseudo_inv()*res);
+        MatrixX<T> delta(Jr.pseudo_inv()*res);
         result-=delta;
         if (delta.norm()<tol)
             return result;
@@ -183,17 +225,17 @@ template <typename T, typename T2> Matrix<T> GaussNewton_9(Matrix<T> &Data, Matr
  s22=out(4,0);
  s33=out(5,0);*/
 
-template <typename T, typename T2> Matrix<T> GaussNewton_6(Matrix<T> &Data, Matrix<T2> &X0, uint16_t nmax, double tol){
-    Matrix<T> result(X0);
+template <typename T, typename T2> MatrixX<T> GaussNewton_6(MatrixX<T> &Data, MatrixX<T2> &X0, uint16_t nmax, double tol){
+    MatrixX<T> result(X0);
     
     uint16_t nrows=Data.rows();
     uint16_t ncols=Data.columns();
     
     if ((nrows<6)||(ncols!=3))
-        return Matrix<T>(0,0);
+        return MatrixX<T>(0,0);
     
-    Matrix<T> Jr(nrows,6);
-    Matrix<T> res(nrows,1);
+    MatrixX<T> Jr(nrows,6);
+    MatrixX<T> res(nrows,1);
     for (int n_iter=1;n_iter<nmax;n_iter++){
         for (int jj=0;jj<nrows;jj++){
             T d1=Data.get(jj,0) - result.get(0,0);
@@ -211,7 +253,7 @@ template <typename T, typename T2> Matrix<T> GaussNewton_6(Matrix<T> &Data, Matr
             res.set(jj,0)= t1*t1+t2*t2+t3*t3-1;
         }
         // pseudo-inverse*res (inv(Jr'*Jr)*Jr'*res)
-        Matrix<T> delta(Jr.pseudo_inv()*res);
+        MatrixX<T> delta(Jr.pseudo_inv()*res);
         result-=delta;
         if (delta.norm()<tol)
             return result;

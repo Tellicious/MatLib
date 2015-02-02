@@ -9,8 +9,8 @@
 #ifndef test_MatLib_h
 #define test_MatLib_h
 
-#include "Matrix.h"
-#include "Matrix.tpp"
+#include "MatrixX.h"
+#include "MatrixX.tpp"
 #include "Num_methods.h"
 
 #endif
