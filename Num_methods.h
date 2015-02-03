@@ -14,7 +14,7 @@
 //-------------------Forward substitution----------------------//
 // assumes that the matrix A is already a lower triangular one. No check!
 
-template <typename T, typename T2> MatrixX<T> fwsub(MatrixX<T> &A, MatrixX<T2> &B){
+template <typename T, typename T2> MatrixX<T> fwsub(const MatrixX<T> &A, const MatrixX<T2> &B){
     MatrixX<T> result(A.columns(),B.columns());
     for (int k=0;k<B.columns();k++){
         result.set(0,k) = B.get(0,k) / A.get(0,0);
@@ -32,7 +32,7 @@ template <typename T, typename T2> MatrixX<T> fwsub(MatrixX<T> &A, MatrixX<T2> &
 //---------------Forward substitution with permutation-------------------//
 // assumes that the matrix A is already a lower triangular one. No check!
 
-template <typename T, typename T2> MatrixX<T> fwsub_P(MatrixX<T> &A, MatrixX<T2> &B, MatrixXs &P){
+template <typename T, typename T2> MatrixX<T> fwsub_P( const MatrixX<T> &A, const MatrixX<T2> &B, MatrixXs &P){
     MatrixX<T> result(A.columns(),B.columns());
     for (int k=0;k<B.columns();k++){
         result.set(0,k) = B.get(P.get(0,0),k) / A.get(0,0);
@@ -50,7 +50,7 @@ template <typename T, typename T2> MatrixX<T> fwsub_P(MatrixX<T> &A, MatrixX<T2>
 //-------------------Backward substitution----------------------//
 // assumes that the matrix A is already an upper triangular one. No check!
 
-template <typename T, typename T2> MatrixX<T> bksub(MatrixX<T> &A, MatrixX<T2> &B){
+template <typename T, typename T2> MatrixX<T> bksub(const MatrixX<T> &A, const MatrixX<T2> &B){
     int16_t ncolsA=A.columns();
     MatrixX<T> result(ncolsA,B.columns());
     for (int k=0;k<B.columns();k++){
@@ -69,7 +69,7 @@ template <typename T, typename T2> MatrixX<T> bksub(MatrixX<T> &A, MatrixX<T2> &
 //--------------Backward substitution with permutation-----------------//
 // assumes that the matrix A is already an upper triangular one. No check!
 
-template <typename T, typename T2> MatrixX<T> bksub_P(MatrixX<T> &A, MatrixX<T2> &B, MatrixXs &P){
+template <typename T, typename T2> MatrixX<T> bksub_P(const MatrixX<T> &A, const MatrixX<T2> &B, MatrixXs &P){
     int16_t ncolsA=A.columns();
     MatrixX<T> result(ncolsA,B.columns());
     for (int k=0;k<B.columns();k++){
@@ -128,7 +128,7 @@ template <typename T> bool LU_Cormen(const MatrixX<T> &A, MatrixX<T> &L, MatrixX
     L.identity();
     U.zeros();
     
-    for (k=0; k<nrowsA-1; k++) {
+    for (k=0; k<nrowsA; k++) {
         U.set(k,k)=A_tmp.get(k,k);
         if (A_tmp.get(k,k)==0){
             return false;
@@ -144,7 +144,6 @@ template <typename T> bool LU_Cormen(const MatrixX<T> &A, MatrixX<T> &L, MatrixX
             }
         }
     }
-    U.set(nrowsA-1,nrowsA-1)=A.get(nrowsA-1,nrowsA-1);
     return true;
 };
 
@@ -152,7 +151,7 @@ template <typename T> bool LU_Cormen(const MatrixX<T> &A, MatrixX<T> &L, MatrixX
 // factorizes the A matrix as the product of a upper triangular matrix U and a unit lower triangular matrix L
 // returns the factor that has to be multiplied to the determinant of U in order to obtain the correct value
 
-template <typename T> int8_t LUP_Cormen(MatrixX<T> &A, MatrixX<T> &L, MatrixX<T> &U, MatrixXs &P){
+template <typename T> int8_t LUP_Cormen(const MatrixX<T> &A, MatrixX<T> &L, MatrixX<T> &U, MatrixXs &P){
     MatrixX<T> A_tmp(A);
     int16_t nrowsA=A_tmp.rows();
     int16_t i,j,k;
@@ -218,7 +217,7 @@ template <typename T> int8_t LUP_Cormen(MatrixX<T> &A, MatrixX<T> &L, MatrixX<T>
 //-----------------------Linear system solver using LU factorization---------------------------//
 // solves the linear system A*X=B, where A is a n-by-n matrix and B an n-by-m matrix, giving the n-by-m matrix X
 
-template<typename T>  MatrixX<T> LinSolveLU(MatrixX<T> &A, MatrixX<T> &B) {
+template<typename T>  MatrixX<T> LinSolveLU(const MatrixX<T> &A, const MatrixX<T> &B) {
     MatrixX<T> L(A.rows(),A.columns());
     MatrixX<T> U(L);
     LU_Crout(A, L, U);
@@ -229,7 +228,7 @@ template<typename T>  MatrixX<T> LinSolveLU(MatrixX<T> &A, MatrixX<T> &B) {
 //----------------------Linear system solver using LUP factorization--------------------------//
 // solves the linear system A*X=B, where A is a n-by-n matrix and B an n-by-m matrix, giving the n-by-m matrix X
 
-template<typename T>  MatrixX<T> LinSolveLUP(MatrixX<T> &A, MatrixX<T> &B) {
+template<typename T>  MatrixX<T> LinSolveLUP(const MatrixX<T> &A, const MatrixX<T> &B) {
     MatrixX<T> L(A.rows(),A.columns());
     MatrixX<T> U(L);
     MatrixXs P(A.rows(),1);
@@ -241,7 +240,7 @@ template<typename T>  MatrixX<T> LinSolveLUP(MatrixX<T> &A, MatrixX<T> &B) {
 //------------Linear system solver using Gauss elimination with partial pivoting---------------//
 // solves the linear system A*X=B, where A is a n-by-n matrix and B an n-by-m matrix, giving the n-by-m matrix X
 
-template<typename T>  MatrixX<T> LinSolveGauss(MatrixX<T> &A, MatrixX<T> &B) {
+template<typename T>  MatrixX<T> LinSolveGauss(const MatrixX<T> &A, const MatrixX<T> &B) {
     MatrixX<T> A_tmp=A;
     MatrixX<T> B_tmp=B;
     int16_t pivrow=0;     // keeps track of current pivot row
@@ -323,7 +322,7 @@ template<typename T>  MatrixX<T> LinSolveGauss(MatrixX<T> &A, MatrixX<T> &B) {
  s23=out(7,0);
  s33=out(8,0);*/
 
-template <typename T, typename T2> MatrixX<T> GaussNewton_9(MatrixX<T> &Data, MatrixX<T2> &X0, uint16_t nmax, double tol){
+template <typename T, typename T2> MatrixX<T> GaussNewton_9(const MatrixX<T> &Data, MatrixX<T2> &X0, uint16_t nmax, double tol){
     MatrixX<T> result(X0);
     uint16_t nrows=Data.rows();
     uint16_t ncols=Data.columns();
@@ -376,7 +375,7 @@ template <typename T, typename T2> MatrixX<T> GaussNewton_9(MatrixX<T> &Data, Ma
  s22=out(4,0);
  s33=out(5,0);*/
 
-template <typename T, typename T2> MatrixX<T> GaussNewton_6(MatrixX<T> &Data, MatrixX<T2> &X0, uint16_t nmax, double tol){
+template <typename T, typename T2> MatrixX<T> GaussNewton_6(const MatrixX<T> &Data, MatrixX<T2> &X0, uint16_t nmax, double tol){
     MatrixX<T> result(X0);
     
     uint16_t nrows=Data.rows();

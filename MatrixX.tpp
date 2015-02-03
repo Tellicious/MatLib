@@ -10,6 +10,15 @@
 #include <math.h>
 #include <stdint.h>
 
+//====================================Functions Prototypes=========================================//
+
+template <typename T> bool LU_Crout(const MatrixX<T> &A, MatrixX<T> &L, MatrixX<T> &U);
+template <typename T> bool LU_Cormen(const MatrixX<T> &A, MatrixX<T> &L, MatrixX<T> &U);
+template <typename T> int8_t LUP_Cormen(const MatrixX<T> &A, MatrixX<T> &L, MatrixX<T> &U, MatrixXs &P);
+template<typename T>  MatrixX<T> LinSolveLU(const MatrixX<T> &A, const MatrixX<T> &B);
+template<typename T>  MatrixX<T> LinSolveLUP(const MatrixX<T> &A, const MatrixX<T> &B);
+template<typename T>  MatrixX<T> LinSolveGauss(const MatrixX<T> &A, const MatrixX<T> &B);
+
 //==========================================Assignment=============================================//
 //-----------------------Constructor------------------------//
 template<typename T>
@@ -350,7 +359,8 @@ MatrixX<T>& MatrixX<T>::normalize() {
 //-------Moore-Penrose pseudo inverse---------//
 template<typename T>
 MatrixX<T> MatrixX<T>::pseudo_inv() {
-    return MatrixX<T>(!((~(*this))*(*this))*(~(*this)));
+    MatrixX<T> tran=~(*this);
+    return LinSolveLU((tran*(*this)), tran);
 }
 
 //=====================================Logical Operations=======================================//
@@ -440,40 +450,29 @@ T MatrixX<T>::product() const {
 //-----------Returns the determinant----------//
 template<typename T>
 T MatrixX<T>::det() const{
-    // LU decomposition using Crout's method
     MatrixX<T> U(_nrows,_nrows);
     MatrixX<T> L(_nrows,_nrows);
-    int16_t ii, jj, kk;
-    T sum = 0;
+    int16_t ii;
     T determinant=1;
-    U.identity();
-    
-    for (jj = 0; jj < _nrows; jj++) {
-        for (ii = jj; ii < _nrows; ii++) {
-            sum = 0;
-            for (kk = 0; kk < jj; kk++) {
-                sum += L.get(ii,kk) * U(kk,jj);
-            }
-            L.set(ii,jj) = get(ii,jj) - sum;
+    if(LU_Cormen(*this, L, U)){
+        for (ii=0;ii<_nrows;ii++){
+            determinant*=U.get(ii,ii);
         }
-        
-        for (ii = jj; ii < _nrows; ii++) {
-            sum = 0;
-            for(kk = 0; kk < jj; kk++) {
-                sum += L.get(jj,kk) * U.get(kk,ii);
+        return determinant;
+    }
+    else{
+        MatrixXs P(_nrows,1);
+        int8_t det_f=LUP_Cormen(*this,L,U,P);
+        if(det_f){
+            for (ii=0;ii<_nrows;ii++){
+                determinant*=U.get(ii,ii);
             }
-            if (L.get(jj,jj) == 0) {
-                return 0;
-            }
-            U.set(jj,ii) = (get(jj,ii) - sum) / L.get(jj,jj);
+            return determinant*det_f;
+        }
+        else {
+            return 0.0;
         }
     }
-    // Done LU decomposition
-    // Since U is a unit upper triangular matrix, the determinant is just the product of the diagonal elements of L
-    for (ii=0;ii<_nrows;ii++){
-        determinant*=L.get(ii,ii);
-    }
-    return determinant;
 }
 
 //------------Returns a subMatrix------------//
