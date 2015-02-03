@@ -13,6 +13,7 @@
 
 //-------------------Forward substitution----------------------//
 // assumes that the matrix A is already a lower triangular one. No check!
+
 template <typename T, typename T2> MatrixX<T> fwsub(MatrixX<T> &A, MatrixX<T2> &B){
     MatrixX<T> result(A.columns(),B.columns());
     for (int k=0;k<B.columns();k++){
@@ -28,8 +29,27 @@ template <typename T, typename T2> MatrixX<T> fwsub(MatrixX<T> &A, MatrixX<T2> &
     return result;
 };
 
+//---------------Forward substitution with permutation-------------------//
+// assumes that the matrix A is already a lower triangular one. No check!
+
+template <typename T, typename T2> MatrixX<T> fwsub_P(MatrixX<T> &A, MatrixX<T2> &B, MatrixXs &P){
+    MatrixX<T> result(A.columns(),B.columns());
+    for (int k=0;k<B.columns();k++){
+        result.set(0,k) = B.get(P.get(0,0),k) / A.get(0,0);
+        for (int i=1;i<A.rows();i++){
+            T tmp=0.0;
+            for (int j=0;j<i;j++){
+                tmp+=A.get(i,j) * (result.get(j,k));
+            }
+            result.set(i, k)= (B.get(P.get(i,0),k) - tmp) / A.get(i,i);
+        }
+    }
+    return result;
+};
+
 //-------------------Backward substitution----------------------//
 // assumes that the matrix A is already an upper triangular one. No check!
+
 template <typename T, typename T2> MatrixX<T> bksub(MatrixX<T> &A, MatrixX<T2> &B){
     int16_t ncolsA=A.columns();
     MatrixX<T> result(ncolsA,B.columns());
@@ -45,15 +65,36 @@ template <typename T, typename T2> MatrixX<T> bksub(MatrixX<T> &A, MatrixX<T2> &
     }
     return result;
 };
+
+//--------------Backward substitution with permutation-----------------//
+// assumes that the matrix A is already an upper triangular one. No check!
+
+template <typename T, typename T2> MatrixX<T> bksub_P(MatrixX<T> &A, MatrixX<T2> &B, MatrixXs &P){
+    int16_t ncolsA=A.columns();
+    MatrixX<T> result(ncolsA,B.columns());
+    for (int k=0;k<B.columns();k++){
+        result.set(ncolsA-1,k) = B.get(P.get(ncolsA-1,0),k) / A.get(ncolsA-1,ncolsA-1);
+        for (int i=A.rows()-2;i>=0;i--){
+            T tmp=0.0;
+            for (int j=ncolsA-1;j>i;j--){
+                tmp+=A.get(i,j) * (result.get(j,k));
+            }
+            result.set(i, k)= (B.get(P.get(i,0),k) - tmp) / A.get(i,i);
+        }
+    }
+    return result;
+};
+
 //-------------------------LU factorization using Crout's Method--------------------------------//
 // factorizes the A matrix as the product of a unit upper triangular matrix U and a lower triangular matrix L
-template <typename T> bool LU_crout(const MatrixX<T> &A, MatrixX<T> &L, MatrixX<T> &U){
+
+template <typename T> bool LU_Crout(const MatrixX<T> &A, MatrixX<T> &L, MatrixX<T> &U){
+    MatrixX<T> A_tmp(A);
     int16_t ii, jj, kk;
     T sum = 0;
     int16_t nrowsA=A.rows();
-    L.zeros();
     U.identity();
-    
+    L.zeros();
     for (jj = 0; jj < nrowsA; jj++) {
         for (ii = jj; ii < nrowsA; ii++) {
             sum = 0;
@@ -77,15 +118,125 @@ template <typename T> bool LU_crout(const MatrixX<T> &A, MatrixX<T> &L, MatrixX<
     return true;
 };
 
+//-------------------------LU factorization using Cormen's Method--------------------------------//
+// factorizes the A matrix as the product of a unit upper triangular matrix U and a lower triangular matrix L
+template <typename T> bool LU_Cormen(const MatrixX<T> &A, MatrixX<T> &L, MatrixX<T> &U){
+    MatrixX<T> A_tmp(A);
+    int16_t i, j, k;
+    T tmp;
+    int16_t nrowsA=A.rows();
+    L.identity();
+    U.zeros();
+    
+    for (k=0; k<nrowsA-1; k++) {
+        U.set(k,k)=A_tmp.get(k,k);
+        if (A_tmp.get(k,k)==0){
+            return false;
+        }
+        tmp=1.0/U.get(k,k);
+        for (i=k+1; i<nrowsA; i++) {
+            L.set(i,k)=A_tmp.get(i,k)*tmp;
+            U.set(k,i)=A_tmp.get(k,i);
+        }
+        for (i=k+1; i<nrowsA; i++) {
+            for (j=k+1; j<nrowsA; j++) {
+                A_tmp.set(i,j)-=L.get(i,k)*U.get(k,j);
+            }
+        }
+    }
+    U.set(nrowsA-1,nrowsA-1)=A.get(nrowsA-1,nrowsA-1);
+    return true;
+};
+
+//-----------------------LUP factorization using Cormen's Method------------------------------//
+// factorizes the A matrix as the product of a upper triangular matrix U and a unit lower triangular matrix L
+// returns the factor that has to be multiplied to the determinant of U in order to obtain the correct value
+
+template <typename T> int8_t LUP_Cormen(MatrixX<T> &A, MatrixX<T> &L, MatrixX<T> &U, MatrixXs &P){
+    MatrixX<T> A_tmp(A);
+    int16_t nrowsA=A_tmp.rows();
+    int16_t i,j,k;
+    T tmp,tmp2;
+    int8_t d_mult=1; // determinant multiplying factor
+    // initialization
+    for (i = 0; i < nrowsA; i++){
+        P(i,0) = i;
+    }
+    U.zeros();
+    L.identity();
+    
+    // outer loop over diagonal pivots
+    for (k = 0; k < nrowsA-1; k++) {
+        
+        // inner loop to find the largest pivot
+        int16_t pivrow = k;
+        tmp=fabs(A_tmp.get(k,k));
+        for (i = k+1 ; i < nrowsA; i++){
+            tmp2=fabs(A_tmp.get(i,k));
+            if (tmp2 > tmp){
+                tmp=tmp2;
+                pivrow = i;
+            }
+        }
+        
+        // check for singularity
+        if (A_tmp.get(pivrow,k)==0) {
+            return 0;
+        }
+        
+        // swap rows
+        if (pivrow != k) {
+            P.set(k,0)=pivrow;
+            P.set(pivrow,0)=k;
+            d_mult*=-1;
+            
+            for (j = 0; j < nrowsA; j++){
+                tmp=A_tmp.get(k,j);
+                A_tmp.set(k,j)=A_tmp.get(pivrow,j);
+                A_tmp.set(pivrow,j)=tmp;
+            }
+        }
+        tmp=1.0/A_tmp.get(k,k);
+        // Gaussian elimination
+        for (i = k + 1; i < nrowsA; i++) { // iterate down rows
+            A_tmp.set(i,k) *= tmp;
+            for (j = k + 1; j < nrowsA; j++){ // iterate across rows
+                A_tmp.set(i,j) -= A_tmp.get(i,k) * A_tmp.get(k,j);
+            }
+        }
+    }
+    for (k=0;k<nrowsA;k++){
+        U.set(k,k)=A_tmp.get(k,k);
+        for (j=k+1;j<nrowsA;j++){
+            L.set(j,k)=A_tmp.get(j,k);
+            U.set(k,j)=A_tmp.get(k,j);
+        }
+    }
+    return d_mult;
+};
+
 //-----------------------Linear system solver using LU factorization---------------------------//
 // solves the linear system A*X=B, where A is a n-by-n matrix and B an n-by-m matrix, giving the n-by-m matrix X
+
 template<typename T>  MatrixX<T> LinSolveLU(MatrixX<T> &A, MatrixX<T> &B) {
     MatrixX<T> L(A.rows(),A.columns());
     MatrixX<T> U(L);
-    LU_crout(A, L, U);
+    LU_Crout(A, L, U);
     MatrixX<T> y=fwsub(L,B);
     return MatrixX<T>(bksub(U,y));
-}
+};
+
+//----------------------Linear system solver using LUP factorization--------------------------//
+// solves the linear system A*X=B, where A is a n-by-n matrix and B an n-by-m matrix, giving the n-by-m matrix X
+
+template<typename T>  MatrixX<T> LinSolveLUP(MatrixX<T> &A, MatrixX<T> &B) {
+    MatrixX<T> L(A.rows(),A.columns());
+    MatrixX<T> U(L);
+    MatrixXs P(A.rows(),1);
+    LUP_Cormen(A, L, U, P);
+    MatrixX<T> y=fwsub_P(L,B,P);
+    return MatrixX<T>(bksub(U,y));
+};
 
 //------------Linear system solver using Gauss elimination with partial pivoting---------------//
 // solves the linear system A*X=B, where A is a n-by-n matrix and B an n-by-m matrix, giving the n-by-m matrix X

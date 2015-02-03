@@ -13,7 +13,7 @@ template <typename T> void mprint(MatrixX<T>& r) {
     std::cout << "\n" << (int) r.rows() << "x" << (int) r.columns() << "\n";
     for(int i=0; i<r.rows(); i++) {
         for (int j=0; j<r.columns(); j++)
-            printf("%4.4f\t",r(i,j));
+            printf("%4.4f\t",(double) r(i,j));
         std::cout << "\n";
     }
 }
@@ -104,11 +104,13 @@ int main(int argc, const char * argv[]) {
     MatrixXd Soli=!AA*BB;
     MatrixXd Solg=LinSolveGauss(AA, BB);
     MatrixXd Soll=LinSolveLU(AA, BB);
+    MatrixXd Soll2=LinSolveLUP(AA, BB);
     mprint(Soli);
     mprint(Solg);
     mprint(Soll);
+    mprint(Soll2);
     printf("\n%f\n",AA.det());
-    
+
     
     
     return 0;
