@@ -41,7 +41,9 @@ public:
     template <typename T2> MatrixX<T>& elw_multSelf(const MatrixX<T2> &rhs); //element-wise musltiplication in place
     template <typename T2> MatrixX<T> cross(const MatrixX<T2> &rhs) const; //vector cross product
     MatrixX<T> operator-() const; // opposed Matrix
-    MatrixX<T> operator!() const; // inverse Matrix
+    MatrixX<T> operator!() const; // inversed Matrix
+    MatrixX<T> inversed() const; //inversed Matrix using LU decomposition
+    MatrixX<T> inversed_rob() const; //robust inversed Matrix using LUP decomposition
     MatrixX<T>& inverse(); //inverse in-place
     MatrixX<T> operator~() const; //transposed Matrix
     MatrixX<T> normalized(); //normalized Matrix

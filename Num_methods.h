@@ -32,7 +32,7 @@ template <typename T, typename T2> MatrixX<T> fwsub(const MatrixX<T> &A, const M
 //---------------Forward substitution with permutation-------------------//
 // assumes that the matrix A is already a lower triangular one. No check!
 
-template <typename T, typename T2> MatrixX<T> fwsub_P( const MatrixX<T> &A, const MatrixX<T2> &B, MatrixXs &P){
+template <typename T, typename T2> MatrixX<T> fwsub( const MatrixX<T> &A, const MatrixX<T2> &B, MatrixXs &P){
     MatrixX<T> result(A.columns(),B.columns());
     for (int k=0;k<B.columns();k++){
         result.set(0,k) = B.get(P.get(0,0),k) / A.get(0,0);
@@ -69,7 +69,7 @@ template <typename T, typename T2> MatrixX<T> bksub(const MatrixX<T> &A, const M
 //--------------Backward substitution with permutation-----------------//
 // assumes that the matrix A is already an upper triangular one. No check!
 
-template <typename T, typename T2> MatrixX<T> bksub_P(const MatrixX<T> &A, const MatrixX<T2> &B, MatrixXs &P){
+template <typename T, typename T2> MatrixX<T> bksub(const MatrixX<T> &A, const MatrixX<T2> &B, MatrixXs &P){
     int16_t ncolsA=A.columns();
     MatrixX<T> result(ncolsA,B.columns());
     for (int k=0;k<B.columns();k++){
@@ -221,8 +221,7 @@ template<typename T>  MatrixX<T> LinSolveLU(const MatrixX<T> &A, const MatrixX<T
     MatrixX<T> L(A.rows(),A.columns());
     MatrixX<T> U(L);
     LU_Crout(A, L, U);
-    MatrixX<T> y=fwsub(L,B);
-    return MatrixX<T>(bksub(U,y));
+    return MatrixX<T>(bksub(U,fwsub(L,B)));
 };
 
 //----------------------Linear system solver using LUP factorization--------------------------//
@@ -233,7 +232,7 @@ template<typename T>  MatrixX<T> LinSolveLUP(const MatrixX<T> &A, const MatrixX<
     MatrixX<T> U(L);
     MatrixXs P(A.rows(),1);
     LUP_Cormen(A, L, U, P);
-    MatrixX<T> y=fwsub_P(L,B,P);
+    MatrixX<T> y=fwsub(L,B,P);
     return MatrixX<T>(bksub(U,y));
 };
 

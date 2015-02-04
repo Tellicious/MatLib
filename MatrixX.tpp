@@ -241,6 +241,22 @@ MatrixX<T> MatrixX<T>::operator!() const{
     return result;
 }
 
+//--------------------Inverse LU------------------------//
+template<typename T>
+MatrixX<T> MatrixX<T>::inversed() const{
+    MatrixX<T> Eye(_nrows,_nrows);
+    Eye.identity();
+    return LinSolveLU(*this, Eye);
+}
+
+//-----------------Robust Inverse LUP-------------------//
+template<typename T>
+MatrixX<T> MatrixX<T>::inversed_rob() const{
+    MatrixX<T> Eye(_nrows,_nrows);
+    Eye.identity();
+    return LinSolveLUP(*this, Eye);
+}
+
 //-----------------Inverse in place--------------------//
 template<typename T>
 MatrixX<T>& MatrixX<T>::inverse() {

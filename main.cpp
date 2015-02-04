@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <chrono>
 #include "Matlib.h"
 
 template <typename T> void mprint(MatrixX<T>& r) {
@@ -102,13 +103,46 @@ int main(int argc, const char * argv[]) {
     MatrixXd AA(4,4,_dataA);
     MatrixXd BB(4,4,_dataB);
     MatrixXd Soli=!AA*BB;
+    auto t1 = std::chrono::high_resolution_clock::now();
     MatrixXd Solg=LinSolveGauss(AA, BB);
+    auto t2 = std::chrono::high_resolution_clock::now();
     MatrixXd Soll=LinSolveLU(AA, BB);
+    auto t3 = std::chrono::high_resolution_clock::now();
     MatrixXd Soll2=LinSolveLUP(AA, BB);
+    auto t4 = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count()<<"\n";
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count()<<"\n";
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count()<<"\n";
     mprint(Soli);
     mprint(Solg);
     mprint(Soll);
     mprint(Soll2);
+    auto t5 = std::chrono::high_resolution_clock::now();
+    MatrixXd invA1=!AA;
+    auto t6 = std::chrono::high_resolution_clock::now();
+    MatrixXd invA2=AA.inversed();
+    auto t7 = std::chrono::high_resolution_clock::now();
+    MatrixXd invA3=AA.inversed_rob();
+    auto t8 = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(t6-t5).count()<<"\n";
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(t7-t6).count()<<"\n";
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(t8-t7).count()<<"\n";
+    mprint(invA1);
+    mprint(invA2);
+    mprint(invA3);
+    MatrixXd LL(AA);
+    MatrixXd UU(AA);
+    MatrixXs PP(4,1);
+    auto t9 = std::chrono::high_resolution_clock::now();
+    LU_Cormen(AA, LL, UU);
+    auto t10 = std::chrono::high_resolution_clock::now();
+    LU_Crout(AA, LL, UU);
+    auto t11 = std::chrono::high_resolution_clock::now();
+    LUP_Cormen(AA, LL, UU, PP);
+    auto t12 = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(t10-t9).count()<<"\n";
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(t11-t10).count()<<"\n";
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(t12-t11).count()<<"\n";
     printf("\n%f\n",AA.det());
 
     
