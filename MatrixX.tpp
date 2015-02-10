@@ -199,7 +199,7 @@ template <typename T2> MatrixX<T>& MatrixX<T>::operator*=(T2 scalar){
     return *this;
 }
 
-//-----------Element-wise multiplication ---------------//
+//-----------Element-wise multiplication---------------//
 template<typename T>
 template <typename T2> MatrixX<T> MatrixX<T>::elw_mult(const MatrixX<T2> &rhs) const{
     // element-wise multiplication
@@ -212,6 +212,22 @@ template <typename T2> MatrixX<T>& MatrixX<T>::elw_multSelf(const MatrixX<T2> &r
     // element-wise multiplication with self-modification
     for (uint8_t i=0; i<_nrows*_ncols; i++)
         _data[i]*= rhs.getData(i);
+    return *this;
+}
+
+//----------------Element-wise division-----------------//
+template<typename T>
+template <typename T2> MatrixX<T> MatrixX<T>::elw_div(const MatrixX<T2> &rhs) const{
+    // element-wise multiplication
+    return MatrixX<T>(*this).elw_divSelf(rhs);
+}
+
+//------------Element-wise division in place------------//
+template<typename T>
+template <typename T2> MatrixX<T>& MatrixX<T>::elw_divSelf(const MatrixX<T2> &rhs) {
+    // element-wise multiplication with self-modification
+    for (uint8_t i=0; i<_nrows*_ncols; i++)
+        _data[i]/= rhs.getData(i);
     return *this;
 }
 
