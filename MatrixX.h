@@ -17,12 +17,12 @@ public:
     MatrixX<T>(uint8_t m=0, uint8_t n=0, T* data=0);// constructor
     MatrixX<T>(const MatrixX<T> &rhs); // initializes one Matrix as equal to another, same datatype
     template <typename T2>  MatrixX<T>(const MatrixX<T2> &rhs); // initializes one Matrix as equal to another, different datatype
-    T& set(uint8_t i, uint8_t j); // sets one single element
-    T& operator()(uint8_t i, uint8_t j=0); //sets and returns one single element
+    inline T& set(uint8_t i, uint8_t j); // sets one single element
+    inline T& operator()(uint8_t i, uint8_t j=0); //sets and returns one single element
     virtual ~MatrixX<T>(); // deconstructor
     MatrixX<T>& identity(); // sets the Matrix to an identity Matrix
     MatrixX<T>& zeros(); // fills the Matrix with zeros
-    MatrixX<T>& operator=(const MatrixX<T> &rhs); // assignment
+    inline MatrixX<T>& operator=(const MatrixX<T> &rhs); // assignment
     MatrixX<T>& operator=(const std::initializer_list<T> &rhs); // assignment with list
     //==================Operations==================//
     template <typename T2> MatrixX<T> operator+(const MatrixX<T2> &rhs) const; // Matrix addition
@@ -57,27 +57,27 @@ public:
     template <typename T2> bool  operator!=(const MatrixX<T2> &other) const; // true if two matrices are different
     
     //==================Matrix Data==================//
-    const T& get(uint8_t i, uint8_t j) const; //retrieves one single element
+    inline T& get(uint8_t i, uint8_t j) const; //retrieves one single element
     T trace() const; // retrieves the trace
-    uint8_t rows() const; // retrieves the number of rows
-    uint8_t columns() const; // retrieves the number of columns
-    uint8_t length() const; // retrieves the lenght of the Matrix
+    inline uint8_t rows() const; // retrieves the number of rows
+    inline uint8_t columns() const; // retrieves the number of columns
+    inline uint8_t length() const; // retrieves the lenght of the Matrix
     double norm() const; //retrives the norm of the Matrix
     T sum() const; //retrieves the sum of all the elements
     T product()const; //retrieves the product of all the elements
     T det() const; //retrieves the determinant of the Matrix
     MatrixX<T> subMatrix(uint8_t row_top, uint8_t col_left, uint8_t row_bottom, uint8_t col_right) const; //returns a subMatrix of the original
     //===============Auxiliary Functions==============//
-    template <typename T2> MatrixX<T>& copyData(const T2* data); //sets new data
-    T& getData(uint8_t i) const; //retrieve a single data
-    T* data() const; // retrieve all data
+    template <typename T2> inline MatrixX<T>& copyData(const T2* data); //sets new data
+    inline T& getData(uint8_t i) const; //retrieve a single data
+    inline T* data() const; // retrieve all data
     
 private:
     //-------Private Functions------//
     void release();
     void allocate();
     template <typename T2> MatrixX<T>& copyMatrix(const MatrixX<T2> &another);
-    uint8_t index(uint8_t i, uint8_t j) const;
+    inline uint8_t index(uint8_t i, uint8_t j) const;
     //-------Private Variables-----//
     T* _data;
     uint8_t _nrows;

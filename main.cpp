@@ -138,6 +138,8 @@ int main(int argc, const char * argv[]) {
     mprint(Solg);
     mprint(Soll);
     mprint(Soll2);
+    MatrixXd Eye(AA);
+    Eye.identity();
     auto t5 = std::chrono::high_resolution_clock::now();
     MatrixXd invA1=!AA;
     auto t6 = std::chrono::high_resolution_clock::now();
@@ -165,8 +167,5 @@ int main(int argc, const char * argv[]) {
     std::cout << std::chrono::duration_cast<std::chrono::microseconds>(t11-t10).count()<<"\n";
     std::cout << std::chrono::duration_cast<std::chrono::microseconds>(t12-t11).count()<<"\n";
     printf("\n%f\n",AA.det());
-
-    
-    
     return 0;
 }

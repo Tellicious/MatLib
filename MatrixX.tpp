@@ -55,14 +55,14 @@ template <typename T2> MatrixX<T>::MatrixX(const MatrixX<T2> &rhs) {
 
 //--------------------Sets single element-------------------//
 template<typename T>
-T& MatrixX<T>::set(uint8_t i, uint8_t j) {
-    return _data[(i * _ncols + j)];
+inline T& MatrixX<T>::set(uint8_t i, uint8_t j) {
+    return _data[index(i,j)];
 }
 
 //--------------Sets and returns single element-------------//
 template<typename T>
-T& MatrixX<T>::operator()(uint8_t i, uint8_t j){
-    return set(i, j);
+inline T& MatrixX<T>::operator()(uint8_t i, uint8_t j){
+    return _data[index(i,j)];
 }
 
 //----------------------Deconstructor-----------------------//
@@ -92,7 +92,7 @@ MatrixX<T>& MatrixX<T>::zeros(){
 
 //-----------------------Assignment------------------------//
 template<typename T>
-MatrixX<T>& MatrixX<T>::operator=(const MatrixX<T> &rhs) {
+inline MatrixX<T>& MatrixX<T>::operator=(const MatrixX<T> &rhs) {
     return copyMatrix(rhs);
 }
 
@@ -174,7 +174,7 @@ template <typename T2> MatrixX<T> MatrixX<T>::operator*(const MatrixX<T2> &rhs) 
     for (uint8_t i=0; i < _nrows; i++)
         for (uint8_t j=0; j < rhs.columns(); j++)
             for (uint8_t k=0; k < _ncols; k++)
-                result(i, j) += get(i, k) * rhs.get(k, j);
+                result.set(i, j) += get(i, k) * rhs.get(k, j);
     return result;
 }
 
@@ -381,9 +381,9 @@ MatrixX<T> MatrixX<T>::normalized() {
 //------------Nomalized in place---------------//
 template<typename T>
 MatrixX<T>& MatrixX<T>::normalize() {
-    T k = norm();
+    T k = 1.0 / norm();
     if (k > 0) {
-        *this *= (1 / k);
+        *this *= k;
     }
     return *this;
 }
@@ -419,8 +419,8 @@ template <typename T2> bool  MatrixX<T>::operator!=(const MatrixX<T2> &other) co
 //=======================================Matrix Data=========================================//
 //---------Returns one single element---------//
 template<typename T>
-const T& MatrixX<T>::get(uint8_t i, uint8_t j) const{
-    return _data[(i * _ncols + j)];
+inline T& MatrixX<T>::get(uint8_t i, uint8_t j) const{
+    return _data[index(i,j)];
 }
 
 //-------------Returns the trace-------------//
@@ -435,19 +435,19 @@ T MatrixX<T>::trace() const {
 
 //---------Returns the number of rows--------//
 template<typename T>
-uint8_t MatrixX<T>::rows() const{
+inline uint8_t MatrixX<T>::rows() const{
     return _nrows;
 }
 
 //-------Returns the number of columns-------//
 template<typename T>
-uint8_t MatrixX<T>::columns() const{
+inline uint8_t MatrixX<T>::columns() const{
     return _ncols;
 }
 
 //------------Returns the length------------//
 template<typename T>
-uint8_t MatrixX<T>::length() const{
+inline uint8_t MatrixX<T>::length() const{
     return fmax(_nrows, _ncols);
 }
 
@@ -524,7 +524,7 @@ MatrixX<T> MatrixX<T>::subMatrix(uint8_t row_top, uint8_t col_left, uint8_t row_
 //==========================================Auxiliary=============================================//
 //------------Copies data of one Matrix to another-------------//
 template<typename T>
-template <typename T2> MatrixX<T>& MatrixX<T>::copyData(const T2* data) {
+template <typename T2> inline MatrixX<T>& MatrixX<T>::copyData(const T2* data) {
     for (uint8_t i=0; i<_nrows*_ncols; i++)
         this->_data[i] = (T) data[i];
     return *this;
@@ -532,13 +532,13 @@ template <typename T2> MatrixX<T>& MatrixX<T>::copyData(const T2* data) {
 
 //------------Returns one single value of data-----------------//
 template<typename T>
-T& MatrixX<T>::getData(uint8_t i) const{
+inline T& MatrixX<T>::getData(uint8_t i) const{
     return _data[i];
 }
 
 //-------------Returns the whole data vector-------------------//
 template<typename T>
-T* MatrixX<T>::data() const{
+inline T* MatrixX<T>::data() const{
     return this->_data;
 }
 
@@ -584,7 +584,7 @@ template <typename T2> MatrixX<T>& MatrixX<T>::copyMatrix(const MatrixX<T2> &ano
 
 //---------------Data index from row and column----------------//
 template<typename T>
-uint8_t MatrixX<T>::index(uint8_t i, uint8_t j) const{
-    return i * _ncols + j;
+inline uint8_t MatrixX<T>::index(uint8_t i, uint8_t j) const{
+    return (i * _ncols + j);
 }
 
