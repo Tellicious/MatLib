@@ -37,9 +37,9 @@ public:
     template <typename T2> MatrixX<T> operator*(T2 scalar) const; // Matrix scalar multiplication
     template <typename T2> MatrixX<T>& operator*=(const MatrixX<T2> &rhs);  // Matrix product in place
     template <typename T2> MatrixX<T>& operator*=(T2 scalar); // Matrix scalar multiplication in place
-    template <typename T2> MatrixX<T> elw_mult(const MatrixX<T2> &rhs) const; //element-wise multiplication
+    template <typename T2> MatrixX<T> operator%(const MatrixX<T2> &rhs) const; //element-wise multiplication
     template <typename T2> MatrixX<T>& elw_multSelf(const MatrixX<T2> &rhs); //element-wise musltiplication in place
-    template <typename T2> MatrixX<T> elw_div(const MatrixX<T2> &rhs) const; //element-wise division
+    template <typename T2> MatrixX<T> operator/(const MatrixX<T2> &rhs) const; //element-wise division
     template <typename T2> MatrixX<T>& elw_divSelf(const MatrixX<T2> &rhs); //element-wise musltiplication in place
     template <typename T2> MatrixX<T> cross(const MatrixX<T2> &rhs) const; //vector cross product
     MatrixX<T> operator-() const; // opposed Matrix

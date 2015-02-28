@@ -159,7 +159,7 @@ template <typename T> int8_t LUP_Cormen(const MatrixX<T> &A, MatrixX<T> &L, Matr
     int8_t d_mult=1; // determinant multiplying factor
     // initialization
     for (i = 0; i < nrowsA; i++){
-        P(i,0) = i;
+        P.set(i,0) = i;
     }
     U.zeros();
     L.identity();
@@ -177,7 +177,6 @@ template <typename T> int8_t LUP_Cormen(const MatrixX<T> &A, MatrixX<T> &L, Matr
                 pivrow = i;
             }
         }
-        
         // check for singularity
         if (A_tmp.get(pivrow,k)==0) {
             return 0;
@@ -185,8 +184,9 @@ template <typename T> int8_t LUP_Cormen(const MatrixX<T> &A, MatrixX<T> &L, Matr
         
         // swap rows
         if (pivrow != k) {
-            P.set(k,0)=pivrow;
-            P.set(pivrow,0)=k;
+            tmp=P.get(k,0);
+            P.set(k,0)=P.get(pivrow,0);
+            P.set(pivrow,0)=tmp;
             d_mult*=-1;
             
             for (j = 0; j < nrowsA; j++){
@@ -220,7 +220,7 @@ template <typename T> int8_t LUP_Cormen(const MatrixX<T> &A, MatrixX<T> &L, Matr
 template<typename T>  MatrixX<T> LinSolveLU(const MatrixX<T> &A, const MatrixX<T> &B) {
     MatrixX<T> L(A.rows(),A.columns());
     MatrixX<T> U(L);
-    LU_Crout(A, L, U);
+    LU_Cormen(A, L, U);
     return MatrixX<T>(bksub(U,fwsub(L,B)));
 };
 
@@ -232,8 +232,7 @@ template<typename T>  MatrixX<T> LinSolveLUP(const MatrixX<T> &A, const MatrixX<
     MatrixX<T> U(L);
     MatrixXs P(A.rows(),1);
     LUP_Cormen(A, L, U, P);
-    MatrixX<T> y=fwsub(L,B,P);
-    return MatrixX<T>(bksub(U,y));
+    return MatrixX<T>(bksub(U,fwsub(L,B,P)));
 };
 
 //------------Linear system solver using Gauss elimination with partial pivoting---------------//
@@ -257,7 +256,7 @@ template<typename T>  MatrixX<T> LinSolveGauss(const MatrixX<T> &A, const Matrix
         for (i = k+1; i < ncolsA; i++)
         {
             tmp2=fabs(A_tmp.get(i,k)); // 'Avoid using other functions inside abs()?'
-            if (tmp2 >= tmp)
+            if (tmp2 > tmp)
             {
                 tmp = tmp2;
                 pivrow = i;
@@ -406,6 +405,24 @@ template <typename T, typename T2> MatrixX<T> GaussNewton_6(const MatrixX<T> &Da
         result-=delta;
         if (delta.norm()<tol)
             return result;
+    }
+    return result;
+};
+
+//------------------Quadratic form (sort of)----------------------//
+// returns matrix C=A*B*(~A)
+template <typename T, typename T2> MatrixX<T2> QuadProd(const MatrixX<T> &A, const MatrixX<T2> &B){
+    MatrixX<T2> result(A.rows(),A.rows());
+    for (int n=0; n<A.rows(); n++) {
+        for (int i=0; i<A.columns(); i++) {
+            double tmp=0;
+            for (int j=0;j<A.columns();j++){
+                tmp+=A.get(n,j)*B.get(i,j);
+            }
+            for (int ii=0; ii<A.rows(); ii++) {
+                result.set(ii,n)+=A.get(ii,i)*tmp;
+            }
+        }
     }
     return result;
 };

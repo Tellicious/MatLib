@@ -74,9 +74,8 @@ MatrixX<T>::~MatrixX() {
 //---------------------Identity Matrix----------------------//
 template<typename T>
 MatrixX<T>& MatrixX<T>::identity() {
-    zeros();
-    for(uint8_t i=0; i<_nrows; i++) {
-        set(i,i) = 1.0;
+    for(uint8_t i=0; i<_nrows*_ncols; i++) {
+        ((i/_ncols)==(i%_ncols))?_data[i]=1.0:_data[i]=0.0;
     }
     return *this;
 }
@@ -85,7 +84,7 @@ MatrixX<T>& MatrixX<T>::identity() {
 template<typename T>
 MatrixX<T>& MatrixX<T>::zeros(){
     for (uint8_t i=0; i<_nrows * _ncols; i++) {
-        this->_data[i] = 0.0;
+        _data[i] = 0.0;
     }
     return *this;
 }
@@ -201,7 +200,7 @@ template <typename T2> MatrixX<T>& MatrixX<T>::operator*=(T2 scalar){
 
 //-----------Element-wise multiplication---------------//
 template<typename T>
-template <typename T2> MatrixX<T> MatrixX<T>::elw_mult(const MatrixX<T2> &rhs) const{
+template <typename T2> MatrixX<T> MatrixX<T>::operator%(const MatrixX<T2> &rhs) const{
     // element-wise multiplication
     return MatrixX<T>(*this).elw_multSelf(rhs);
 }
@@ -217,7 +216,7 @@ template <typename T2> MatrixX<T>& MatrixX<T>::elw_multSelf(const MatrixX<T2> &r
 
 //----------------Element-wise division-----------------//
 template<typename T>
-template <typename T2> MatrixX<T> MatrixX<T>::elw_div(const MatrixX<T2> &rhs) const{
+template <typename T2> MatrixX<T> MatrixX<T>::operator/(const MatrixX<T2> &rhs) const{
     // element-wise multiplication
     return MatrixX<T>(*this).elw_divSelf(rhs);
 }
@@ -252,9 +251,7 @@ MatrixX<T> MatrixX<T>::operator-() const{
 //---------------------Inverse-------------------------//
 template<typename T>
 MatrixX<T> MatrixX<T>::operator!() const{
-    MatrixX<T> result(*this);
-    result.inverse();
-    return result;
+    return MatrixX<T> (*this).inverse();
 }
 
 //--------------------Inverse LU------------------------//
@@ -587,4 +584,3 @@ template<typename T>
 inline uint8_t MatrixX<T>::index(uint8_t i, uint8_t j) const{
     return (i * _ncols + j);
 }
-
