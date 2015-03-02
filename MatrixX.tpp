@@ -75,7 +75,7 @@ MatrixX<T>::~MatrixX() {
 template<typename T>
 MatrixX<T>& MatrixX<T>::identity() {
     for(uint8_t i=0; i<_nrows*_ncols; i++) {
-        ((i/_ncols)==(i%_ncols))?_data[i]=1.0:_data[i]=0.0;
+       _data[i]= (((i/_ncols)==(i%_ncols))?1.0:0.0);
     }
     return *this;
 }
