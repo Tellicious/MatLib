@@ -307,7 +307,7 @@ template<typename T>  MatrixX<T> LinSolveGauss(const MatrixX<T> &A, const Matrix
 };
 
 //------------Gauss-Newton Method with 9 parameters---------------//
-// approximates Data to a sphere by calculating 6 gains (s) and 3 biases (b), useful to calibrate some sensors (meas_sphere=S*(meas-B) with S symmetric)
+// approximates Data to a sphere of radius k by calculating 6 gains (s) and 3 biases (b), useful to calibrate some sensors (meas_sphere=S*(meas-B) with S symmetric)
 // Data has n>=9 rows corresponding to the number of measures and 3 columns corresponding to the 3 axis
 // X0 is the starting guess vector (usually [0 0 0 1 0 0 1 0 1]), nmax the maximum number of iterations (200 is generally fine, even if it usually converges within 10 iterations), and tol the stopping tolerance (1e-6 is usually more than fine)
 /*b1=out(0,0);
@@ -320,10 +320,11 @@ template<typename T>  MatrixX<T> LinSolveGauss(const MatrixX<T> &A, const Matrix
  s23=out(7,0);
  s33=out(8,0);*/
 
-template <typename T, typename T2> MatrixX<T> GaussNewton_9(const MatrixX<T> &Data, MatrixX<T2> &X0, uint16_t nmax, double tol){
+template <typename T, typename T2> MatrixX<T> GaussNewton_9(const MatrixX<T> &Data, T k, MatrixX<T2> &X0, uint16_t nmax, double tol){
     MatrixX<T> result(X0);
     uint16_t nrows=Data.rows();
     uint16_t ncols=Data.columns();
+    T k2=k*k;
     
     if ((nrows<9)||(ncols!=3))
         return MatrixX<T>(0,0);
@@ -350,7 +351,7 @@ template <typename T, typename T2> MatrixX<T> GaussNewton_9(const MatrixX<T> &Da
             T t1=result.get(3,0)*d1 + result.get(4,0)*d2 + result.get(5,0)*d3;
             T t2=result.get(4,0)*d1 + result.get(6,0)*d2 + result.get(7,0)*d3;
             T t3=result.get(5,0)*d1 + result.get(7,0)*d2 + result.get(8,0)*d3;
-            res.set(jj,0)= t1*t1+t2*t2+t3*t3-1;
+            res.set(jj,0)= t1*t1+t2*t2+t3*t3-k2;
         }
         // pseudo-inverse*res (inv(Jr'*Jr)*Jr'*res)
         MatrixX<T> delta(Jr.pseudo_inv()*res);
@@ -363,7 +364,7 @@ template <typename T, typename T2> MatrixX<T> GaussNewton_9(const MatrixX<T> &Da
 
 
 //------------Gauss-Newton Method with 6 parameters---------------//
-// approximates Data to a sphere by calculating 3 gains (s) and 3 biases (b), useful to calibrate some sensors (meas_sphere=S*(meas-B) with S diagonal)
+// approximates Data to a sphere of radius k by calculating 3 gains (s) and 3 biases (b), useful to calibrate some sensors (meas_sphere=S*(meas-B) with S diagonal)
 // Data has n>=6 rows corresponding to the number of measures and 3 columns corresponding to the 3 axis
 // X0 is the starting guess vector (usually [0 0 0 1 1 1]), nmax the maximum number of iterations (200 is generally fine, even if it usually converges within 10 iterations), and tol the stopping tolerance (1e-6 is usually more than fine)
 /*b1=out(0,0);
@@ -373,11 +374,12 @@ template <typename T, typename T2> MatrixX<T> GaussNewton_9(const MatrixX<T> &Da
  s22=out(4,0);
  s33=out(5,0);*/
 
-template <typename T, typename T2> MatrixX<T> GaussNewton_6(const MatrixX<T> &Data, MatrixX<T2> &X0, uint16_t nmax, double tol){
+template <typename T, typename T2> MatrixX<T> GaussNewton_6(const MatrixX<T> &Data, T k, MatrixX<T2> &X0, uint16_t nmax, double tol){
     MatrixX<T> result(X0);
     
     uint16_t nrows=Data.rows();
     uint16_t ncols=Data.columns();
+    T k2=k*k;
     
     if ((nrows<6)||(ncols!=3))
         return MatrixX<T>(0,0);
@@ -398,7 +400,7 @@ template <typename T, typename T2> MatrixX<T> GaussNewton_6(const MatrixX<T> &Da
             T t1=result.get(3,0)*d1;
             T t2=result.get(4,0)*d2;
             T t3=result.get(5,0)*d3;
-            res.set(jj,0)= t1*t1+t2*t2+t3*t3-1;
+            res.set(jj,0)= t1*t1+t2*t2+t3*t3-k2;
         }
         // pseudo-inverse*res (inv(Jr'*Jr)*Jr'*res)
         MatrixX<T> delta(Jr.pseudo_inv()*res);
