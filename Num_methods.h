@@ -306,7 +306,7 @@ template<typename T>  MatrixX<T> LinSolveGauss(const MatrixX<T> &A, const Matrix
     return(MatrixX<T>(bksub(A_tmp,B_tmp)));
 };
 
-//------------Gauss-Newton Method with 9 parameters---------------//
+//------------Gauss-Newton sensors calibration with 9 parameters---------------//
 // approximates Data to a sphere of radius k by calculating 6 gains (s) and 3 biases (b), useful to calibrate some sensors (meas_sphere=S*(meas-B) with S symmetric)
 // Data has n>=9 rows corresponding to the number of measures and 3 columns corresponding to the 3 axis
 // X0 is the starting guess vector (usually [0 0 0 1 0 0 1 0 1]), nmax the maximum number of iterations (200 is generally fine, even if it usually converges within 10 iterations), and tol the stopping tolerance (1e-6 is usually more than fine)
@@ -320,7 +320,7 @@ template<typename T>  MatrixX<T> LinSolveGauss(const MatrixX<T> &A, const Matrix
  s23=out(7,0);
  s33=out(8,0);*/
 
-template <typename T, typename T2> MatrixX<T> GaussNewton_9(const MatrixX<T> &Data, T k, MatrixX<T2> &X0, uint16_t nmax, double tol){
+template <typename T, typename T2> MatrixX<T> GaussNewton_Sens_Cal_9(const MatrixX<T> &Data, T k, MatrixX<T2> &X0, uint16_t nmax, double tol){
     MatrixX<T> result(X0);
     uint16_t nrows=Data.rows();
     uint16_t ncols=Data.columns();
@@ -363,7 +363,7 @@ template <typename T, typename T2> MatrixX<T> GaussNewton_9(const MatrixX<T> &Da
 };
 
 
-//------------Gauss-Newton Method with 6 parameters---------------//
+//------------Gauss-Newton sensors calibration with 6 parameters---------------//
 // approximates Data to a sphere of radius k by calculating 3 gains (s) and 3 biases (b), useful to calibrate some sensors (meas_sphere=S*(meas-B) with S diagonal)
 // Data has n>=6 rows corresponding to the number of measures and 3 columns corresponding to the 3 axis
 // X0 is the starting guess vector (usually [0 0 0 1 1 1]), nmax the maximum number of iterations (200 is generally fine, even if it usually converges within 10 iterations), and tol the stopping tolerance (1e-6 is usually more than fine)
@@ -374,7 +374,7 @@ template <typename T, typename T2> MatrixX<T> GaussNewton_9(const MatrixX<T> &Da
  s22=out(4,0);
  s33=out(5,0);*/
 
-template <typename T, typename T2> MatrixX<T> GaussNewton_6(const MatrixX<T> &Data, T k, MatrixX<T2> &X0, uint16_t nmax, double tol){
+template <typename T, typename T2> MatrixX<T> GaussNewton_Sens_Cal_6(const MatrixX<T> &Data, T k, MatrixX<T2> &X0, uint16_t nmax, double tol){
     MatrixX<T> result(X0);
     
     uint16_t nrows=Data.rows();
