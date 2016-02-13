@@ -6,8 +6,8 @@
 //  Copyright (c) 2015 Andrea Vivani. All rights reserved.
 //
 
-#ifndef test_MatLib_h
-#define test_MatLib_h
+#ifndef _MatLib_h
+#define _MatLib_h
 
 #include "MatrixX.h"
 #include "MatrixX.tpp"

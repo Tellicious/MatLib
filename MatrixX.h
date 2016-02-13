@@ -6,8 +6,8 @@
 //  Copyright (c) 2015 Andrea Vivani. All rights reserved.
 //
 
-#ifndef MatrixX_H_
-#define MatrixX_H_
+#ifndef _MatrixX_H_
+#define _MatrixX_H_
 #include <stdint.h>
 
 template <typename T>
@@ -96,4 +96,4 @@ typedef MatrixX<float>                  MatrixXf;
 typedef MatrixX<double>                 MatrixXd;
 
 
-#endif /* MatrixX_H_ */
+#endif /* _MatrixX_H_ */
