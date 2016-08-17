@@ -136,11 +136,13 @@ template <typename T2> MatrixX<T>& MatrixX<T>::operator+=(T2 scalar) {
         _data[i]+= scalar;
     return *this;
 }
+
 //------------------Matrix subtraction--------------------//
 template<typename T>
 template <typename T2>MatrixX<T> MatrixX<T>::operator-(const MatrixX<T2> &rhs) const{
     return MatrixX<T>(*this) -= rhs;
 }
+
 //------------------Scalar subtraction--------------------//
 template<typename T>
 template <typename T2> MatrixX<T> MatrixX<T>::operator-(T2 scalar) const{
@@ -476,6 +478,7 @@ T MatrixX<T>::product() const {
         result *= _data[i];
     return result;
 }
+
 //-----------Returns the determinant----------//
 template<typename T>
 T MatrixX<T>::det() const{

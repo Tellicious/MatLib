@@ -89,7 +89,6 @@ template <typename T, typename T2> MatrixX<T> bksub(const MatrixX<T> &A, const M
 // factorizes the A matrix as the product of a unit upper triangular matrix U and a lower triangular matrix L
 
 template <typename T> bool LU_Crout(const MatrixX<T> &A, MatrixX<T> &L, MatrixX<T> &U){
-    MatrixX<T> A_tmp(A);
     int16_t ii, jj, kk;
     T sum = 0;
     int16_t nrowsA=A.rows();
@@ -331,7 +330,7 @@ template <typename T, typename T2> MatrixX<T> GaussNewton_Sens_Cal_9(const Matri
     
     MatrixX<T> Jr(nrows,9);
     MatrixX<T> res(nrows,1);
-    for (int n_iter=1;n_iter<nmax;n_iter++){
+    for (int n_iter=0;n_iter<nmax;n_iter++){
         for (int jj=0;jj<nrows;jj++){
             T d1=Data.get(jj,0) - result.get(0,0);
             T d2=Data.get(jj,1) - result.get(1,0);
@@ -386,7 +385,7 @@ template <typename T, typename T2> MatrixX<T> GaussNewton_Sens_Cal_6(const Matri
     
     MatrixX<T> Jr(nrows,6);
     MatrixX<T> res(nrows,1);
-    for (int n_iter=1;n_iter<nmax;n_iter++){
+    for (int n_iter=0;n_iter<nmax;n_iter++){
         for (int jj=0;jj<nrows;jj++){
             T d1=Data.get(jj,0) - result.get(0,0);
             T d2=Data.get(jj,1) - result.get(1,0);
