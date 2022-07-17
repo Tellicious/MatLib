@@ -1,2 +1,2 @@
 # MatLib
-C++ lightweight Matrix Library
+C / C++ lightweight Matrix Library
