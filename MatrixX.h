@@ -1,15 +1,45 @@
-//
-//  MatrixX.h
-//
-//
-//  Created by Andrea Vivani on 31/1/15.
-//  Copyright (c) 2015 Andrea Vivani. All rights reserved.
-//
+/* BEGIN Header */
+/**
+ ******************************************************************************
+ * @file    MatrixX.h
+ * @author  Andrea Vivani
+ * @brief   Implementation of lightweight matrix object
+ ******************************************************************************
+ * @copyright
+ *
+ * Copyright 2015 Andrea Vivani
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the “Software”), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ ******************************************************************************
+ */
+/* END Header */
 
-#ifndef _MatrixX_H_
-#define _MatrixX_H_
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __MATRIXX_H__
+#define __MATRIXX_H__
+
+/* Includes ------------------------------------------------------------------*/
+
 #include <stdint.h>
 
+/* Class ---------------------------------------------------------------------*/
 template <typename T>
 class MatrixX {
 public:
@@ -96,4 +126,4 @@ typedef MatrixX<float>                  MatrixXf;
 typedef MatrixX<double>                 MatrixXd;
 
 
-#endif /* _MatrixX_H_ */
+#endif // __MATRIXX_H__
